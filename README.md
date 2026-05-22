@@ -1,10 +1,19 @@
 # End-to-End-Devops-Pipeline
 
 A Node.js REST API for task management, built with a full DevOps pipeline for production deployment.
-**Tech Stack** : Node.js · Express · PostgreSQL · Docker · Kubernetes · Jenkins · Prometheus · Grafana · Loki · Helm · Ingress + DNS
 
-![Docker](https://img.shields.io/badge/docker-%230db7ed.svg)
-
+![Docker](https://img.shields.io/badge/docker-2496ED?style=flat&logo=docker&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/kubernetes-326CE5?style=flat&logo=kubernetes&logoColor=white)
+![Amazon EKS](https://img.shields.io/badge/Amazon%20EKS-FF9900?style=flat&logo=amazon-eks&logoColor=white)
+![Jenkins](https://img.shields.io/badge/jenkins-D24939?style=flat&logo=jenkins&logoColor=white)
+![Node.js](https://img.shields.io/badge/node.js-339933?style=flat&logo=nodedotjs&logoColor=white)
+![Prometheus](https://img.shields.io/badge/prometheus-E6522C?style=flat&logo=prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/grafana-F46800?style=flat&logo=grafana&logoColor=white)
+![Loki](https://img.shields.io/badge/loki-F2CC0C?style=flat&logo=grafana&logoColor=black)
+![Cloudflare](https://img.shields.io/badge/cloudflare-F38020?style=flat&logo=cloudflare&logoColor=white)
+![Ingress](https://img.shields.io/badge/ingress-009639?style=flat&logo=nginx&logoColor=white)
+![Helm](https://img.shields.io/badge/helm-0F1689?style=flat&logo=helm&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/postgresql-4169E1?style=flat&logo=postgresql&logoColor=white)
 
 ## What it does:
 
@@ -217,26 +226,90 @@ curl -X POST http://<EXTERNAL-IP>/tasks \
 -d '{"title":"learn ingress"}'
 ```
 
+# Create the servicemonitor
+
+This tells prometheus to scrape these metrics too
+
+```shell
+kubectl apply -f k8s/app/servicemonitor.yaml
+```
+
 # Monitoring
 
-## Install Loki 
+## Install Loki Chart
+
+```shell
+helm install loki grafana/loki-stack --namespace monitoring
+```
+
+This will Promtail and Loki except Grafana which is not installed by default by this chart.
+
+```shell
+kubectl get svc -n monitoring
+```
+
+Remember the Service name of the loki since it has to be added as the Data source for the Grafana in the next step
 
 ## Install the kube-prometheus-stack helm chart
 
 ```shell
-helm repo add prometheus-community \
-https://prometheus-community.github.io/helm-charts
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts -n monitoring
 ```
 
 ```shell
 helm repo update
 ```
 
+Now we need to add loki as the datasource so do this
+
 ```shell
-helm install monitoring \
-prometheus-community/kube-prometheus-stack \
---namespace monitoring \
---create-namespace
+vim values.yaml
+```
+and then add these lines
+
+```yml
+grafana:
+     additionalDataSources:
+       - name: Loki
+         type: loki
+         url: http://loki.monitoring.svc.cluster.local:3100
+         access: proxy
+         isDefault: false
+```
+
+Upgrade the chart,
+
+```shell
+helm upgrade monitoring prometheus-community/kube-prometheus-stack -n monitoring -f values.yaml
+```
+
+## Updating for prometheus
+
+By default the prometheus uses only those servicemonitors that are in the same namespace as the where the chart is installed and the label of the servicemonitor should have the same label as the Helm release name like this
+
+```yml
+metadata:
+  labels:
+     release: monitoring
+```
+
+but in our case the servicemonitor is in another namespace so we need to update the values.yaml file again
+
+```shell
+helm get values monitoring prometheus-community/kube-prometheus-stack -n monitoring -o yaml > latest_values.yaml
+```
+Add these lines,
+
+```yml
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelector: {}
+    serviceMonitorNamespaceSelector: {}
+```
+
+```shell
+helm upgrade monitoring prometheus-community/kube-prometheus-stack -n monitoring -f latest_values.yaml
 ```
 
 ### Verify Pods
@@ -251,13 +324,6 @@ kubectl get pods -n monitoring
 kubectl get services -n monitoring
 ```
 
-Output:
-The services installed by this helm chart are
-
-```shell
-monitoring-grafana
-monitoring-kube-prometheus-prometheus
-```
 ## Access Grafana
 
 ### Port-forward:
@@ -287,33 +353,4 @@ kubectl get secret monitoring-grafana \
 -n monitoring \
 -o jsonpath="{.data.admin-password}" | base64 --decode
 ```
-# Add Application Metrics
 
-Currently Prometheus monitors cluster infrastructure.
-Now we expose:
-
-```shell
-/metrics
-```
-from Node.js app.
-
-# Install prom-client
-
-Inside app:
-
-```shell
-npm install prom-client
-```
-# Update server.js
-Add:
-
-```js
-const client = require("prom-client");
-client.collectDefaultMetrics();
-const register = client.register;
-Add Metrics Endpoint
-app.get("/metrics", async (req, res) => {
-  res.set("Content-Type", register.contentType);
-  res.end(await register.metrics());
-})
-```
