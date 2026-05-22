@@ -10,8 +10,10 @@ spec:
   ingressClassName: nginx
 
   rules:
-  - http:
-
+  
+  - host: app.rharishkumar.in
+      
+    http:
       paths:
       - path: /
         pathType: Prefix

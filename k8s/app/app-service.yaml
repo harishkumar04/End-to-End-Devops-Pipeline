@@ -4,14 +4,16 @@ kind: Service
 metadata:
   name: task-app-service
   namespace: devops-project
-
+  labels:
+    app: task-app
 spec:
 
   selector:
     app: task-app
 
   ports:
-  - port: 80
+  - name: http
+    port: 80
     targetPort: 3000
 
   type: ClusterIP

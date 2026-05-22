@@ -1,0 +1,30 @@
+apiVersion: v1
+data:
+  loki-stack-datasource.yaml: |-
+    apiVersion: 1
+    datasources:
+    - name: Loki
+      type: loki
+      access: proxy
+      url: "http://loki:3100"
+      version: 1
+      isDefault: false
+      jsonData:
+        {}
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: loki
+    meta.helm.sh/release-namespace: monitoring
+  creationTimestamp: "2026-05-21T10:26:08Z"
+  labels:
+    app: loki-stack
+    app.kubernetes.io/managed-by: Helm
+    chart: loki-stack-2.10.3
+    grafana_datasource: "1"
+    heritage: Helm
+    release: loki
+  name: loki-loki-stack
+  namespace: monitoring
+  resourceVersion: "12220"
+  uid: dcaa443f-2a2c-47b4-bbdf-00ff05614fa5
