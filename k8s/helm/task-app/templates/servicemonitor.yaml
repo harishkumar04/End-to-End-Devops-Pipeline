@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+
+metadata:
+  name: task-app-monitor
+
+spec:
+
+  selector:
+    matchLabels:
+      app: task-app
+
+  namespaceSelector:
+    matchNames:
+      - devops-project
+
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s

@@ -1,0 +1,14 @@
+image:
+  repository: postgres
+  tag: "16"
+
+postgres:
+  user: postgres
+  password: harish$94
+  database: taskdb
+
+storage:
+  size: 2Gi
+
+service:
+  port: 5432

@@ -5,9 +5,8 @@ pipeline {
     }
  
     environment {
- 
+
         IMAGE_NAME = "harishkumar09/task-app"
- 
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
  
