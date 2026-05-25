@@ -1,7 +1,5 @@
 # End-to-End-Devops-Pipeline
 
-A Node.js REST API for task management, built with a full DevOps pipeline for production deployment.
-
 ![Docker](https://img.shields.io/badge/docker-2496ED?style=flat&logo=docker&logoColor=white)
 ![Kubernetes](https://img.shields.io/badge/kubernetes-326CE5?style=flat&logo=kubernetes&logoColor=white)
 ![Amazon EKS](https://img.shields.io/badge/Amazon%20EKS-FF9900?style=flat&logo=amazon-eks&logoColor=white)
@@ -15,6 +13,8 @@ A Node.js REST API for task management, built with a full DevOps pipeline for pr
 ![Helm](https://img.shields.io/badge/helm-0F1689?style=flat&logo=helm&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/postgresql-4169E1?style=flat&logo=postgresql&logoColor=white)
 
+A Node.js REST API for task management, built with a full DevOps pipeline for production deployment.
+
 ## What it does:
 
 - REST API with 4 endpoints: GET /health, GET /tasks, POST /tasks, DELETE /tasks/:id
@@ -22,6 +22,10 @@ A Node.js REST API for task management, built with a full DevOps pipeline for pr
 - Exposes a GET /metrics endpoint for Prometheus monitoring
 
 ## DevOps Setup:
+
+<img width="1838" height="973" alt="diagram-export-25-5-2026-10_58_04-AM" src="https://github.com/user-attachments/assets/82499005-9b3e-4e0f-a472-4242f1fa5111" />
+
+
 
 - Dockerized with a node:20-alpine image
 - Deployed on Kubernetes (EKS) with separate manifests for the app and PostgreSQL (StatefulSet with PV/PVC)
