@@ -12,6 +12,7 @@
 ![Ingress](https://img.shields.io/badge/ingress-009639?style=flat&logo=nginx&logoColor=white)
 ![Helm](https://img.shields.io/badge/helm-0F1689?style=flat&logo=helm&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/postgresql-4169E1?style=flat&logo=postgresql&logoColor=white)
+![AWS ALB](https://img.shields.io/badge/AWS-ALB-FF9900?logo=amazonaws&logoColor=white)
 
 A Node.js REST API for task management, built with a full DevOps pipeline for production deployment.
 
@@ -287,6 +288,9 @@ Upgrade the chart,
 helm upgrade monitoring prometheus-community/kube-prometheus-stack -n monitoring -f values.yaml
 ```
 
+<img width="1440" height="900" alt="Screenshot 2026-05-21 at 5 45 01 PM" src="https://github.com/user-attachments/assets/11cac348-aa3d-4a94-83c1-ce2fa4aa7e74" />
+
+
 ## Updating for prometheus
 
 By default the prometheus uses only those servicemonitors that are in the same namespace as the where the chart is installed and the label of the servicemonitor should have the same label as the Helm release name like this
@@ -315,6 +319,9 @@ prometheus:
 ```shell
 helm upgrade monitoring prometheus-community/kube-prometheus-stack -n monitoring -f latest_values.yaml
 ```
+
+<img width="1440" height="820" alt="Screenshot 2026-05-21 at 4 51 06 PM" src="https://github.com/user-attachments/assets/65302c65-25e3-4970-9b99-bd78bdb00918" />
+
 
 ### Verify Pods
 
@@ -357,4 +364,35 @@ kubectl get secret monitoring-grafana \
 -n monitoring \
 -o jsonpath="{.data.admin-password}" | base64 --decode
 ```
+
+`Create some dashboards using the Prometheus and Loki as the Datasources to monitor the applicaton`
+
+<img width="1439" height="821" alt="Screenshot 2026-05-21 at 5 19 20 PM" src="https://github.com/user-attachments/assets/fa980302-b9e1-48a5-950e-be9474c83d4f" />
+
+To test this open a new terminal and then do this,
+
+```shell
+while true; do
+  curl http://<EXTERNAL-IP>/tasks
+  echo ""
+  sleep 1
+done
+```
+
+After some time I observed the spike in the CPU usuage in the grafana dashboard
+
+<img width="1438" height="812" alt="Screenshot 2026-05-21 at 5 19 43 PM" src="https://github.com/user-attachments/assets/5731aae9-60ec-46f5-ae6e-dff3a01c297b" />
+
+
+# CNAME Records
+ I added 3 CNAME records to a domain i own in Cloudflare so that users instead of using the AWS ALB DNS Name they can use my Domain record to access the Application, Grafana and Prometheus
+
+ <img width="1047" height="182" alt="Screenshot 2026-05-22 at 9 39 22 AM" src="https://github.com/user-attachments/assets/39f2dc82-cc3a-40f4-815b-a4af7fcd3140" />
+
+# Jenkins 
+
+Created a EC2 instance of t3.medium and then configured it as an Agent in the controller. The controller can ssh into the Agent to run the build and deploy the updated application code to the AWS EKS since the kubeconfig file is updated to use this Agent context too.
+
+<img width="1435" height="816" alt="Screenshot 2026-05-21 at 5 28 18 PM" src="https://github.com/user-attachments/assets/01a13c36-39c3-45ce-9bfd-8994fe932ad5" />
+
 
