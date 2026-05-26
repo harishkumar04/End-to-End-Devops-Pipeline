@@ -394,3 +394,38 @@ Created a EC2 instance of t3.medium and then configured it as an Agent in the co
 <img width="1435" height="816" alt="Screenshot 2026-05-21 at 5 28 18 PM" src="https://github.com/user-attachments/assets/01a13c36-39c3-45ce-9bfd-8994fe932ad5" />
 
 
+
+---
+
+## Helm Charts (App + PostgreSQL)
+
+Two Helm charts are available under `k8s/helm`:
+
+- `k8s/helm/task-app`
+- `k8s/helm/postgres`
+
+Install PostgreSQL:
+
+```shell
+helm install postgres ./k8s/helm/postgres -n devops-project
+```
+
+Install the app:
+
+```shell
+helm install task-app ./k8s/helm/task-app -n devops-project
+```
+
+Verify:
+
+```shell
+kubectl get all -n devops-project
+```
+
+For Jenkins deployment, use Helm instead of applying all manifests:
+
+```shell
+helm upgrade --install task-app ./k8s/helm/task-app \
+  -n devops-project \
+  --set image.tag=${BUILD_NUMBER}
+```

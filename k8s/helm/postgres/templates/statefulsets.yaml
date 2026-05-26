@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: StatefulSet
+
+metadata:
+  name: {{ include "postgres.fullname" . }}
+
+spec:
+
+  serviceName: {{ include "postgres.fullname" . }}
+
+  replicas: {{ .Values.replicaCount | default 1 }}
+
+  selector:
+    matchLabels:
+      {{- toYaml .Values.labels | nindent 6 }}
+      # alternative (helper): include "postgres.selectorLabels" .
+
+  template:
+
+    metadata:
+      labels:
+        {{- toYaml .Values.labels | nindent 8 }}
+        # alternative (helper): include "postgres.selectorLabels" .
+
+    spec:
+
+      containers:
+      - name: {{ include "postgres.name" . }}
+
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+
+        ports:
+        - name: postgres
+          containerPort: {{ .Values.service.port }}
+
+        env:
+
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "postgres.fullname" . }}-secret
+              key: POSTGRES_USER
+
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "postgres.fullname" . }}-secret
+              key: POSTGRES_PASSWORD
+
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "postgres.fullname" . }}-secret
+              key: POSTGRES_DB
+
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql
+
+      volumes:
+      - name: postgres-storage
+
+        persistentVolumeClaim:
+          claimName: {{ include "postgres.fullname" . }}-pvc

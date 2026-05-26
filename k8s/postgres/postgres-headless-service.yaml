@@ -6,7 +6,6 @@ metadata:
   namespace: devops-project
 
 spec:
-
   clusterIP: None
 
   selector:

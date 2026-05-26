@@ -1,0 +1,14 @@
+image:
+  repository: harishkumar09/task-app
+  tag: "v1"
+
+service:
+  port: 80
+  targetPort: 3000
+
+ingress:
+  host: app.rharishkumar.in
+
+postgres:
+  host: postgres
+  port: 5432
