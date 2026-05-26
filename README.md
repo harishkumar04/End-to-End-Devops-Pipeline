@@ -24,9 +24,7 @@ A Node.js REST API for task management, built with a full DevOps pipeline for pr
 
 ## DevOps Setup:
 
-<img width="1838" height="973" alt="diagram-export-25-5-2026-10_58_04-AM" src="https://github.com/user-attachments/assets/82499005-9b3e-4e0f-a472-4242f1fa5111" />
-
-
+<img width="1333" height="612" alt="Screenshot 2026-05-26 at 11 28 45 AM" src="https://github.com/user-attachments/assets/9a5dd164-592d-493b-a807-2dcfdf476da4" />
 
 - Dockerized with a node:20-alpine image
 - Deployed on Kubernetes (EKS) with separate manifests for the app and PostgreSQL (StatefulSet with PV/PVC)
